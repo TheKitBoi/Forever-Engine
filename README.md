@@ -1,3 +1,6 @@
+https://github.com/Yoshubs/Forever-Engine/suites/4078486237/artifacts/103768566
+latest build
+
 # [Forever Engine](https://github.com/Yoshubs/FunkinForever)
 An open-source, modular, optimized, and HOPEFULLY easy to use [Friday Night Funkin'](https://www.newgrounds.com/portal/view/770371) mod engine!
 ----------------------------------------------
