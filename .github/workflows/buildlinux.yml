@@ -34,17 +34,17 @@ jobs:
           sudo apt-get install gcc-multilib g++-multilib haxe -y
           mkdir "%HAXELIB_ROOT%"
           haxelib setup "%HAXELIB_ROOT%"
-          haxelib install hxcpp
-          haxelib install lime 7.9.0
+          haxelib setup C:/haxelib
+          haxelib install lime 7.8.0
           haxelib install openfl
-          haxelib install flixel
+          haxelib install flixel 4.8.1
           haxelib install flixel-ui
-          haxelib run lime setup flixel
-          haxelib run lime setup
-          haxelib install flixel-tools
-          haxelib install flixel-addons
+          haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons
           haxelib install hscript
           haxelib install newgrounds
+          haxelib run lime setup
+          haxelib install flixel-tools
+          haxelib run flixel-tools setup
           haxelib git polymod https://github.com/larsiusprime/polymod.git
           haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc
           haxelib list
