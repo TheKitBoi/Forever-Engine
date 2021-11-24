@@ -38,6 +38,7 @@ jobs:
           haxelib git flixel-addons https://github.com/HaxeFlixel/flixel-addons
           haxelib install hscript
           haxelib install newgrounds
+          haxelib install systools 1.1.0
           haxelib run lime setup
           haxelib install flixel-tools
           haxelib run flixel-tools setup
