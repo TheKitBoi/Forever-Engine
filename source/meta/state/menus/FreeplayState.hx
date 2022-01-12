@@ -21,6 +21,7 @@ import meta.data.dependency.Discord;
 import meta.data.font.Alphabet;
 import openfl.media.Sound;
 import sys.FileSystem;
+import sys.thread.Mutex;
 import sys.thread.Thread;
 
 using StringTools;
@@ -42,6 +43,8 @@ class FreeplayState extends MusicBeatState
 
 	var songThread:Thread;
 	var threadActive:Bool = true;
+	var mutex:Mutex;
+	var songToPlay:Sound = null;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
@@ -58,6 +61,8 @@ class FreeplayState extends MusicBeatState
 	override function create()
 	{
 		super.create();
+
+		mutex = new Mutex();
 
 		/**
 			Wanna add songs? They're in the Main state now, you can just find the week array and add a song there to a specific week.
@@ -100,7 +105,6 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		// LOAD CHARACTERS
-
 		bg = new FlxSprite().loadGraphic(Paths.image('menus/base/menuDesat'));
 		add(bg);
 
@@ -200,8 +204,8 @@ class FreeplayState extends MusicBeatState
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
 
-		var upP = controls.UP_P;
-		var downP = controls.DOWN_P;
+		var upP = controls.UI_UP_P;
+		var downP = controls.UI_DOWN_P;
 		var accepted = controls.ACCEPT;
 
 		if (upP)
@@ -209,9 +213,9 @@ class FreeplayState extends MusicBeatState
 		else if (downP)
 			changeSelection(1);
 
-		if (controls.LEFT_P)
+		if (controls.UI_LEFT_P)
 			changeDiff(-1);
-		if (controls.RIGHT_P)
+		if (controls.UI_RIGHT_P)
 			changeDiff(1);
 
 		if (controls.BACK)
@@ -246,6 +250,21 @@ class FreeplayState extends MusicBeatState
 		scoreBG.width = scoreText.width + 8;
 		scoreBG.x = FlxG.width - scoreBG.width;
 		diffText.x = scoreBG.x + (scoreBG.width / 2) - (diffText.width / 2);
+
+		mutex.acquire();
+		if (songToPlay != null)
+		{
+			FlxG.sound.playMusic(songToPlay);
+
+			if (FlxG.sound.music.fadeTween != null)
+				FlxG.sound.music.fadeTween.cancel();
+
+			FlxG.sound.music.volume = 0.0;
+			FlxG.sound.music.fadeIn(1.0, 0.0, 1.0);
+
+			songToPlay = null;
+		}
+		mutex.release();
 	}
 
 	var lastDifficulty:String;
@@ -340,17 +359,13 @@ class FreeplayState extends MusicBeatState
 						{
 							trace("Loading index " + index);
 
-							var inst:Sound = Sound.fromFile('./' + Paths.inst(songs[curSelected].songName));
+							var inst:Sound = Paths.inst(songs[curSelected].songName);
 
 							if (index == curSelected && threadActive)
 							{
-								FlxG.sound.playMusic(inst);
-
-								if (FlxG.sound.music.fadeTween != null)
-									FlxG.sound.music.fadeTween.cancel();
-
-								FlxG.sound.music.volume = 0.0;
-								FlxG.sound.music.fadeIn(1.0, 0.0, 1.0);
+								mutex.acquire();
+								songToPlay = inst;
+								mutex.release();
 
 								curSongPlaying = curSelected;
 							}
